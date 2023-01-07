@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { Model, Types } from 'mongoose'
+import { FilterQuery, Model, Types } from 'mongoose'
 
 import { Abstract } from '../schema/abstract-document.schema'
 
@@ -56,5 +56,24 @@ export abstract class AbstractRepository<TDocument extends Abstract> {
         `Something happened while trying to process your request, please try again`,
       )
     }
+  }
+
+  async findOne(
+    filterQuery: Partial<FilterQuery<TDocument>>,
+  ): Promise<TDocument> {
+    const foundDoc = await this.model.findOne(filterQuery, {}, { lean: true })
+
+    if (!foundDoc) {
+      this.logger.warn(
+        `Record not found on ${this.modelName} collection with filterQuery`,
+        filterQuery,
+      )
+
+      throw new NotFoundException(
+        `Oop! could not find requested record from ${this.modelName}`,
+      )
+    }
+
+    return foundDoc as unknown as TDocument
   }
 }
