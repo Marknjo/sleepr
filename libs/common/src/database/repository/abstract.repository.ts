@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { FilterQuery, Model, Types } from 'mongoose'
+import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose'
 
 import { Abstract } from '../schema/abstract-document.schema'
 
@@ -53,14 +53,12 @@ export abstract class AbstractRepository<TDocument extends Abstract> {
       }
 
       throw new InternalServerErrorException(
-        `Something happened while trying to process your request, please try again`,
+        `Something unexpected happened while creating a new record, please try again later`,
       )
     }
   }
 
-  async findOne(
-    filterQuery: Partial<FilterQuery<TDocument>>,
-  ): Promise<TDocument> {
+  async findOne(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
     const foundDoc = await this.model.findOne(filterQuery, {}, { lean: true })
 
     if (!foundDoc) {
@@ -75,5 +73,54 @@ export abstract class AbstractRepository<TDocument extends Abstract> {
     }
 
     return foundDoc as unknown as TDocument
+  }
+
+  async findOneAndUpdate(
+    filterQuery: FilterQuery<TDocument>,
+    update: UpdateQuery<TDocument>,
+  ): Promise<TDocument> {
+    try {
+      const updatedDoc = await this.model.findByIdAndUpdate(
+        filterQuery,
+        update,
+        {
+          lean: true,
+          new: true,
+        },
+      )
+
+      if (!updatedDoc) {
+        throw new NotFoundException(
+          `Oop! failed to update ${this.modelName} record`,
+        )
+      }
+
+      return updatedDoc as unknown as TDocument
+    } catch (error) {
+      // log errors
+      this.logger.warn(
+        `Record not updated on ${this.modelName} collection with filterQuery options: `,
+        filterQuery,
+      )
+
+      this.logger.error(error)
+
+      // handle error types
+
+      if (
+        error.name.toLowerCase().includes('validation') ||
+        error instanceof BadRequestException
+      ) {
+        throw new BadRequestException(error.message)
+      }
+
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message)
+      }
+
+      throw new InternalServerErrorException(
+        `Something unexpected happened while updating the record, please try again later`,
+      )
+    }
   }
 }
