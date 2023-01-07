@@ -80,7 +80,7 @@ export abstract class AbstractRepository<TDocument extends Abstract> {
     update: UpdateQuery<TDocument>,
   ): Promise<TDocument> {
     try {
-      const updatedDoc = await this.model.findByIdAndUpdate(
+      const updatedDoc = await this.model.findOneAndUpdate(
         filterQuery,
         update,
         {
@@ -126,5 +126,38 @@ export abstract class AbstractRepository<TDocument extends Abstract> {
 
   async find(filterQuery: FilterQuery<TDocument>) {
     return this.model.find(filterQuery, {}, { lean: true })
+  }
+
+  async findOneAndDelete(filterQuery: FilterQuery<TDocument>) {
+    try {
+      const deletedDoc = await this.model.findOneAndDelete(filterQuery, {
+        lean: true,
+      })
+
+      if (!deletedDoc) {
+        throw new NotFoundException(
+          `Oop! failed to delete ${this.modelName} record`,
+        )
+      }
+
+      return deletedDoc as unknown as TDocument
+    } catch (error) {
+      // log errors
+      this.logger.warn(
+        `Record not deleted on ${this.modelName} collection with filterQuery options: `,
+        filterQuery,
+      )
+
+      this.logger.error(error)
+
+      // handle error types
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message)
+      }
+
+      throw new InternalServerErrorException(
+        `Something unexpected happened while deleting the record, please try again later`,
+      )
+    }
   }
 }
