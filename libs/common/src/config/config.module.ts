@@ -5,7 +5,8 @@ import validationSchema from '../utils/envs.config'
 @Module({
   imports: [
     NestConfigModule.forRoot({
-      validationSchema,
+      envFilePath: ['.env.dev'],
+      validationSchema: validationSchema(),
     }),
   ],
   providers: [ConfigService],
