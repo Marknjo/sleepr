@@ -6,9 +6,11 @@ import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
   toObject: { virtuals: true },
   timestamps: true,
 })
-export abstract class Abstract {
+export class Abstract {
   @Prop({ type: SchemaTypes.ObjectId })
   _id: Types.ObjectId
 }
+
+// export const AbstractSchema = SchemaFactory.createForClass(Abstract)
 
 export type TAbstractDoc = HydratedDocument<Abstract>
