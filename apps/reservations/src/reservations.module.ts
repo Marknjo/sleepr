@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ReservationsService } from './reservations.service'
 import { ReservationsController } from './reservations.controller'
-import { DatabaseModule } from '@app/common'
+import { DatabaseModule, PinoLoggerModule } from '@app/common'
 import { ReservationsRepository } from './reservations.repository'
 import { Reservation, ReservationSchema } from './schemas/reservation.schema'
 
@@ -18,6 +18,7 @@ import { Reservation, ReservationSchema } from './schemas/reservation.schema'
         },
       },
     ]),
+    PinoLoggerModule,
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService, ReservationsRepository],
