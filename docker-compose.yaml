@@ -7,3 +7,14 @@ services:
       - 27021:27017
     env_file:
       - ./.env.local
+
+  reservations:
+    build:
+      context: .
+      dockerfile: ./apps/reservations/Dockerfile
+      target: Development
+    command: pnpm start:dev reservations
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
