@@ -13,8 +13,21 @@ services:
       context: .
       dockerfile: ./apps/reservations/Dockerfile
       target: Development
+    container_name: sleepr-reservations
     command: pnpm start:dev reservations
     ports:
       - 3000:3000
+    volumes:
+      - .:/usr/src/app
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: Development
+    container_name: sleepr-auth
+    command: pnpm start:dev auth
+    ports:
+      - 3001:3001
     volumes:
       - .:/usr/src/app
