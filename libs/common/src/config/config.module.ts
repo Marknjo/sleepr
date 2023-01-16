@@ -1,5 +1,9 @@
 import { Module } from '@nestjs/common'
-import { ConfigService, ConfigModule as NestConfigModule } from '@nestjs/config'
+import {
+  ConfigFactory,
+  ConfigService,
+  ConfigModule as NestConfigModule,
+} from '@nestjs/config'
 import validationSchema from '../utils/envs.config'
 
 @Module({
@@ -12,4 +16,8 @@ import validationSchema from '../utils/envs.config'
   providers: [ConfigService],
   exports: [ConfigService],
 })
-export class ConfigModule {}
+export class ConfigModule {
+  static forFeature(configs: ConfigFactory) {
+    return NestConfigModule.forFeature(configs)
+  }
+}
