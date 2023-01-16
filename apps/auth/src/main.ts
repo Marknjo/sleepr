@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core'
 import { AuthModule } from './auth.module'
-import { ValidationPipe } from '@nestjs/common'
-import { Logger } from 'nestjs-pino'
+import { Logger, ValidationPipe } from '@nestjs/common'
+import { Logger as PinoLogger } from 'nestjs-pino'
+import { env } from 'process'
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule)
@@ -19,10 +20,15 @@ async function bootstrap() {
     }),
   )
 
-  // add pino logger
+  // Pino logger setup
+  app.useLogger(app.get(PinoLogger))
 
-  app.useLogger(app.get(Logger))
+  // start app
+  const port = env.API_PORT
+  await app.listen(port)
 
-  await app.listen(3001)
+  // log api default url
+  const logger = new Logger('Auth API', { timestamp: true })
+  logger.log(`App running on http://localhost:${port}`)
 }
 bootstrap()
