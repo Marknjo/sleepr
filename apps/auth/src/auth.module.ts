@@ -4,7 +4,7 @@ import { AuthService } from './auth.service'
 import { UsersModule } from './users/users.module'
 import { DatabaseModule, PinoLoggerModule } from '@app/common'
 import { JwtModule } from '@nestjs/jwt'
-import { jwtConfigs } from '../configs/jwt-configs'
+import { jwtConfigs } from './configs/jwt-configs'
 import { ConfigModule } from '@nestjs/config'
 import validationSchema from '../utils/env.utils'
 
