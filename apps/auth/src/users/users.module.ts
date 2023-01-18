@@ -3,7 +3,7 @@ import { UsersService } from './users.service'
 import { UsersController } from './users.controller'
 import { UserRepository } from './user.repository'
 import { DatabaseModule } from '@app/common'
-import { User, UserSchema } from './schemas/user.schema'
+import { User, UsersSchema } from './schemas/user.schema'
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { User, UserSchema } from './schemas/user.schema'
       {
         name: User.name,
         useFactory: () => {
-          const schema = UserSchema
+          const schema = UsersSchema
 
           return schema
         },
@@ -20,5 +20,6 @@ import { User, UserSchema } from './schemas/user.schema'
   ],
   controllers: [UsersController],
   providers: [UsersService, UserRepository],
+  exports: [UsersService],
 })
 export class UsersModule {}
