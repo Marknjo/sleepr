@@ -2,11 +2,13 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common'
+import { compare, hash } from 'bcryptjs'
+
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserRepository } from './user.repository'
-import { hash } from 'bcryptjs'
 
 @Injectable()
 export class UsersService {
@@ -45,5 +47,21 @@ export class UsersService {
 
   remove(id: string) {
     return this.userRepo.findOneAndDelete({ _id: id })
+  }
+
+  /**
+   * ----------------------------------
+   *              HELPERS
+   * ----------------------------------
+   */
+  async verifyUser(email: string, password: string) {
+    const user = await this.userRepo.findOne({ email })
+    const isValidPassword = await compare(password, user.password)
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException(`Credentials are invalid`)
+    }
+
+    return user
   }
 }
