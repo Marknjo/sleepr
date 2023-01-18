@@ -40,7 +40,7 @@ export class UsersService {
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
+    return this.userRepo.findOneAndUpdate({ _id: id }, updateUserDto)
   }
 
   remove(id: string) {
