@@ -44,6 +44,6 @@ export class UsersService {
   }
 
   remove(id: string) {
-    return `This action removes a #${id} user`
+    return this.userRepo.findOneAndDelete({ _id: id })
   }
 }
