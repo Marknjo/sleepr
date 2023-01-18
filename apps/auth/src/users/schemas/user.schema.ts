@@ -9,13 +9,15 @@ import { HydratedDocument } from 'mongoose'
   versionKey: false,
 })
 export class User extends Abstract {
-  @Prop()
+  @Prop({
+    unique: true,
+  })
   email: string
 
   @Prop()
   password: string
 }
 
-export const UserSchema = SchemaFactory.createForClass(User)
+export const UsersSchema = SchemaFactory.createForClass(User)
 
 export type TUserDoc = HydratedDocument<User>
