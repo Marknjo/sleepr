@@ -35,3 +35,17 @@ services:
       - 3001:3001
     volumes:
       - .:/usr/src/app
+
+  payments:
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile
+      target: Development
+    container_name: sleepr-payments
+    command: pnpm start:dev payments
+    env_file:
+      - ./apps/payments/.env.development
+    ports:
+      - 3033:3033
+    volumes:
+      - .:/usr/src/app
