@@ -26,6 +26,6 @@ async function bootstrap() {
   app.useLogger(app.get(PinoLogger))
 
   const logger = new Logger('APP')
-  logger.log(`Microservices running on ${port}`)
+  logger.log(`Microservices running on port ${port}`)
 }
 bootstrap()
