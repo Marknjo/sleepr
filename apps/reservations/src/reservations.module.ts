@@ -1,10 +1,19 @@
 import { Module } from '@nestjs/common'
+import { APP_GUARD } from '@nestjs/core'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ClientsModule, Transport } from '@nestjs/microservices'
+
+import {
+  AUTH_SERVICE_KEY,
+  DatabaseModule,
+  JwtAuthGuard,
+  PinoLoggerModule,
+} from '@app/common'
+
 import { ReservationsService } from './reservations.service'
 import { ReservationsController } from './reservations.controller'
-import { DatabaseModule, PinoLoggerModule } from '@app/common'
 import { ReservationsRepository } from './reservations.repository'
 import { Reservation, ReservationSchema } from './schemas/reservation.schema'
-import { ConfigModule } from '@nestjs/config'
 import validationSchema from './utils/env.utils'
 
 @Module({
@@ -25,8 +34,34 @@ import validationSchema from './utils/env.utils'
       },
     ]),
     PinoLoggerModule,
+    ClientsModule.registerAsync([
+      {
+        imports: [ConfigModule],
+        name: AUTH_SERVICE_KEY,
+        useFactory: (config: ConfigService) => {
+          const tcpPort = config.getOrThrow('TCP_AUTH_PORT')
+          const tcpHost = config.getOrThrow('TCP_AUTH_HOST')
+
+          return {
+            options: {
+              transport: Transport.TCP,
+              port: tcpPort,
+              host: tcpHost,
+            },
+          }
+        },
+        inject: [ConfigService],
+      },
+    ]),
   ],
   controllers: [ReservationsController],
-  providers: [ReservationsService, ReservationsRepository],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    ReservationsService,
+    ReservationsRepository,
+  ],
 })
 export class ReservationsModule {}
