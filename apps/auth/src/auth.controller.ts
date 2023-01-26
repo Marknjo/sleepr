@@ -1,12 +1,14 @@
 import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
-
-import { ActiveUser } from './decorators/active-user.decorator'
-import { User } from './users/schemas/user.schema'
 import { Response } from 'express'
+import { MessagePattern, Payload } from '@nestjs/microservices'
+
+import { ActiveUser } from '@app/common'
+import { User } from './users/schemas/user.schema'
 
 import { LocalAuthGuard } from './guards/local-auth.guard'
 import { CreateUserDto } from './users/dto/create-user.dto'
+import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -31,5 +33,18 @@ export class AuthController {
     const user = await this.authService.signUp(createUserDto, res)
 
     res.send(user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('authenticate')
+  async authenticate(@Payload() data: unknown) {
+    const user = data['user']
+
+    user['id'] = user._id.toString()
+
+    delete user['_id']
+    delete user['password']
+
+    return user
   }
 }
