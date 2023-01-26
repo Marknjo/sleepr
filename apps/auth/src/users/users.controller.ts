@@ -8,11 +8,12 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common'
+import { ActiveUser } from '@app/common'
+
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { JwtAuthGuard } from '../guards/jwt-auth.guard'
-import { ActiveUser } from '../decorators/active-user.decorator'
 import { User } from './schemas/user.schema'
 
 @Controller('users')
