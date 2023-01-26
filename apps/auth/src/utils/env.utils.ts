@@ -1,9 +1,12 @@
 import * as Joi from 'joi'
 
+console.log(process.env.JWT_TOKEN_AUDIENCE)
+
 const validationSchema = () =>
   Joi.object({
     // APP
-    API_PORT: Joi.number().default(3001),
+    API_PORT: Joi.number().required(),
+    TCP_PORT: Joi.number().required(),
     JWT_SECRET: Joi.string().required(),
     JWT_TOKEN_AUDIENCE: Joi.string().required(),
     JWT_TOKEN_ISSUER: Joi.string().required(),
