@@ -4,10 +4,10 @@ import {
   createParamDecorator,
 } from '@nestjs/common'
 import { Request } from 'express'
-import { User } from '../users/schemas/user.schema'
+import { IUserData } from '../interfaces'
 
 export const ActiveUser = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): User => {
+  (_data: unknown, ctx: ExecutionContext): IUserData => {
     const req = ctx.switchToHttp().getRequest<Request>()
 
     const user = req?.user
@@ -16,6 +16,6 @@ export const ActiveUser = createParamDecorator(
       throw new UnauthorizedException(`Please login`)
     }
 
-    return user as User
+    return user as IUserData
   },
 )
