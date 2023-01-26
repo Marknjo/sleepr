@@ -3,9 +3,13 @@ import { ReservationsModule } from './reservations.module'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { Logger as LoggerPino } from 'nestjs-pino'
 import { ConfigService } from '@nestjs/config'
+import * as cookieParser from 'cookie-parser'
 
 async function bootstrap() {
   const app = await NestFactory.create(ReservationsModule)
+
+  // configs
+  app.use(cookieParser())
 
   // validations
   app.useGlobalPipes(
