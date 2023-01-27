@@ -6,6 +6,8 @@ const validationSchema = () =>
     API_PORT: Joi.number().default(3000),
     TCP_AUTH_PORT: Joi.number().required(),
     TCP_AUTH_HOST: Joi.string().required(),
+    TCP_PAYMENTS_PORT: Joi.number().required(),
+    TCP_PAYMENTS_HOST: Joi.string().required(),
   })
 
 export default validationSchema
