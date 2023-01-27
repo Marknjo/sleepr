@@ -1,7 +1,5 @@
 import * as Joi from 'joi'
 
-console.log(process.env.JWT_TOKEN_AUDIENCE)
-
 const validationSchema = () =>
   Joi.object({
     // APP
