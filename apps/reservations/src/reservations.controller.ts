@@ -27,8 +27,6 @@ export class ReservationsController {
 
   @Get()
   findAll(@ActiveUser() activeUser: IUserData) {
-    console.log(activeUser)
-
     return this.reservationsService.findAll(activeUser)
   }
 
