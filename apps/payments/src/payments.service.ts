@@ -13,6 +13,8 @@ export class PaymentsService {
     },
   )
 
+  private readonly isDev: boolean = !!this.configSrv.get('NODE_ENV')
+
   constructor(private readonly configSrv: ConfigService) {}
 
   async createCharge(
@@ -20,18 +22,24 @@ export class PaymentsService {
     amount: number,
   ) {
     // create payment method
-    const paymentMethod = await this.stripe.paymentMethods.create({
-      type: 'card',
-      card,
-    })
+    const paymentMethod =
+      this.isDev ||
+      (await this.stripe.paymentMethods.create({
+        type: 'card',
+        card,
+      }))
 
     // create payment intent
     const paymentIntent = await this.stripe.paymentIntents.create({
-      payment_method: paymentMethod.id,
+      payment_method:
+        (paymentMethod as Stripe.PaymentMethod)?.id || 'pm_card_visa',
       amount: amount * 100,
       confirm: true,
-      payment_method_types: ['card'],
-      currency: 'used',
+      currency: 'usd',
+      automatic_payment_methods: {
+        enabled: true,
+        ...(this.isDev ? { allow_redirects: 'never' } : {}),
+      },
     })
 
     this.logger.log('Created a new payment intent')
