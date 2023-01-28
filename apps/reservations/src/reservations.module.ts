@@ -7,6 +7,7 @@ import {
   AUTH_SERVICE_KEY,
   DatabaseModule,
   JwtAuthGuard,
+  PAYMENTS_SERVICE_KEY,
   PinoLoggerModule,
 } from '@app/common'
 
@@ -41,6 +42,23 @@ import validationSchema from './utils/env.utils'
         useFactory: (config: ConfigService) => {
           const tcpPort = config.getOrThrow('TCP_AUTH_PORT')
           const tcpHost = config.getOrThrow('TCP_AUTH_HOST')
+
+          return {
+            options: {
+              transport: Transport.TCP,
+              port: tcpPort,
+              host: tcpHost,
+            },
+          }
+        },
+        inject: [ConfigService],
+      },
+      {
+        imports: [ConfigModule],
+        name: PAYMENTS_SERVICE_KEY,
+        useFactory: (config: ConfigService) => {
+          const tcpPort = config.getOrThrow('TCP_PAYMENTS_PORT')
+          const tcpHost = config.getOrThrow('TCP_PAYMENTS_HOST')
 
           return {
             options: {
