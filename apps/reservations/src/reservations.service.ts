@@ -1,18 +1,36 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { CreateReservationDto } from './dtos/create-reservation.dto'
 import { UpdateReservationDto } from './dtos/update-reservation.dto'
 import { ReservationsRepository } from './reservations.repository'
 import { IUserData } from '@app/common/interfaces'
+import { ClientProxy } from '@nestjs/microservices'
+import { PAYMENTS_SERVICE_KEY } from '@app/common'
+import { map, throwError } from 'rxjs'
 
 @Injectable()
 export class ReservationsService {
-  constructor(private readonly reservationRepository: ReservationsRepository) {}
+  constructor(
+    private readonly reservationRepository: ReservationsRepository,
+
+    @Inject(PAYMENTS_SERVICE_KEY)
+    private readonly paymentsService: ClientProxy,
+  ) {}
 
   create(createReservationDto: CreateReservationDto, activeUser: IUserData) {
-    return this.reservationRepository.create({
-      ...createReservationDto,
-      userId: activeUser.id,
-    })
+    return this.paymentsService
+      .send('create_charge', createReservationDto.charge)
+      .pipe(
+        map(res => {
+          return (
+            this.reservationRepository.create({
+              ...createReservationDto,
+              userId: activeUser.id,
+              invoiceId: res.id,
+            }),
+            throwError(() => new BadRequestException())
+          )
+        }),
+      )
   }
 
   findAll(activeUser: IUserData) {
